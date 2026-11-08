@@ -5,12 +5,9 @@ platforms:
   - __win=10.0
   - __archspec=0=x86_64
 environments:
-  bangla:
+  default:
     channels:
     - url: https://conda.anaconda.org/conda-forge/
-    - url: https://conda.anaconda.org/main/
-    - url: https://conda.anaconda.org/r/
-    - url: https://conda.anaconda.org/msys2/
     indexes:
     - https://pypi.org/simple
     packages:
@@ -242,10 +239,6 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/9b/a6/e6fca338488a896c5e1f661ba3007e83f46700e1a59552b05013d501bc45/netcdf4-1.7.4-cp310-cp310-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/b9/68/6f0eec52016b3b54c5075a44c1dceee1f81651cf22ce1c7762be9b6f43d5/georinex-1.16.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/da/77/66484061dee5fbcb2fdcfa6a491d4efb880725117f4a339d20a5323105df/cftime-1.6.5-cp310-cp310-win_amd64.whl
-  default:
-    channels:
-    - url: https://conda.anaconda.org/conda-forge/
-    packages: {}
 packages:
 - conda: https://conda.anaconda.org/conda-forge/noarch/_python_abi3_support-1.0-hd8ed1ab_3.conda
   sha256: 2a7204314663eeda5dec482a956f0e2eaf289bd5b9953eaaaad0e81aa64638f2

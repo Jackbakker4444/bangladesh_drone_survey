@@ -1,19 +1,14 @@
 [workspace]
 authors = ["Jack Bakker <jack@peek.app>"]
-channels = ['conda-forge']
+channels = ["conda-forge"]
 name = "bangladesh_drone_survey"
-platforms = ['win-64']
+platforms = ["win-64"]
 version = "0.1.0"
 
 [tasks]
+sync = "python sync_ssds_safe.py"
 
 [dependencies]
-
-[environments.bangla]
-no-default-feature = true
-channels = ["conda-forge", "main", "r", "msys2"]
-
-[environments.bangla.dependencies]
 python = "3.10.*"
 numpy = "*"
 pandas = "*"
@@ -30,5 +25,5 @@ pillow = "*"
 opencv = "*"
 pip = "*"
 
-[environments.bangla.pypi-dependencies]
+[pypi-dependencies]
 georinex = "*"
