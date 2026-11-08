@@ -3,53 +3,90 @@ import sys
 from pathlib import Path
 
 # --- CONFIGURATION ---
-SOURCE_DRIVE = r"G:\\"  # Source SSD (Primary)
-TARGET_DRIVE = r"E:\\"  # Target SSD (Backup)
+DRIVE_A = r"G:\\"  # e.g., The SSD with Drone Images
+DRIVE_B = r"F:\\"  # e.g., The SSD with RTK Measurements
+
+# 🛡️ SAFETY FIRST: 
+# Set to True to simulate the merge and see what WILL be copied.
+# Set to False to actually execute the file transfers.
+DRY_RUN = False
 # ----------------------
 
+def run_merge_pass(source: Path, target: Path, dry_run: bool):
+    """Executes a single, non-destructive robocopy pass."""
+    
+    print(f"\n{'='*50}")
+    print(f"Starting Pass: {source} ===> {target}")
+    if dry_run:
+        print("MODE: DRY RUN (No files will be changed)")
+    print(f"{'='*50}\n")
 
-def safe_sync_drives(src: str, dst: str):
-    source_path = Path(src)
-    target_path = Path(dst)
-
-    if not source_path.exists():
-        print(f"Error: Source path '{src}' does not exist.")
-        sys.exit(1)
-
-    if not target_path.exists():
-        print(f"Error: Target path '{dst}' does not exist.")
-        sys.exit(1)
-
-    print(f"Starting non-destructive sync: {src} ===> {dst}")
-    print("Files on the target SSD will NOT be deleted.\n")
-
-    # Robocopy flags:
+    # Core Robocopy flags:
     # /E     : Copy subdirectories, including empty ones.
-    # /XO    : Exclude older files (skips files already up-to-date on destination).
-    # /MT:16 : 16 parallel threads for fast SSD read/write speeds.
-    # /R:2 /W:2 : Retry failed transfers twice, waiting 2 seconds between attempts.
-    # /NP    : Suppress progress percentage per file to keep terminal logs clean.
+    # /XO    : Exclude older files (prevents overwriting newer data).
+    # /MT:16 : 16 parallel threads for SSD speed.
+    # /R:2 /W:2 : Retry failed files twice, wait 2 seconds.
     cmd = [
         "robocopy",
-        str(source_path),
-        str(target_path),
+        str(source),
+        str(target),
         "/E",
         "/XO",
         "/MT:16",
         "/R:2",
         "/W:2",
+        "/XD", "$RECYCLE.BIN", "System Volume Information"
     ]
 
-    result = subprocess.run(cmd, shell=True, check=True)
+    if dry_run:
+        # /L tells robocopy to ONLY list files, not copy or modify them.
+        cmd.append("/L")
 
-    # Robocopy exit codes < 8 indicate successful operations
-    if result.returncode < 8:
-        print("\nSync completed successfully! All new/modified files copied.")
+    # IMPORTANT: We DO NOT use check=True. Robocopy returns codes 1-7 for 
+    # successful operations (e.g., 1 = files copied, 3 = extra files detected).
+    result = subprocess.run(cmd, shell=True)
+
+    # Exit codes 8 and above indicate critical failures (e.g., permissions, hardware errors).
+    if result.returncode >= 8:
+        print(f"\n❌ CRITICAL ERROR: Pass failed with exit code {result.returncode}.")
+        sys.exit(1)
     else:
-        print(
-            f"\nSync finished with warnings/errors (Exit code: {result.returncode})."
-        )
+        print(f"\n✅ Pass completed successfully (Exit code: {result.returncode}).")
+
+
+def safe_bidirectional_merge(drive_a: str, drive_b: str, dry_run: bool):
+    path_a = Path(drive_a)
+    path_b = Path(drive_b)
+
+    # 1. Validation checks
+    if not path_a.exists():
+        print(f"Error: Drive path '{drive_a}' does not exist.")
+        sys.exit(1)
+    if not path_b.exists():
+        print(f"Error: Drive path '{drive_b}' does not exist.")
+        sys.exit(1)
+
+    print("\n" + "#"*50)
+    print(" INITIATING BIDIRECTIONAL SAFE MERGE")
+    print(" Directories will complement each other. Nothing will be deleted.")
+    print("#"*50)
+
+    # 2. Execute Pass 1 (A -> B)
+    # This pushes the Drone Images (and anything else unique to A) onto B.
+    run_merge_pass(path_a, path_b, dry_run)
+
+    # 3. Execute Pass 2 (B -> A)
+    # This pushes the RTK Measurements (and anything else unique to B) onto A.
+    run_merge_pass(path_b, path_a, dry_run)
+
+    print("\n" + "#"*50)
+    if dry_run:
+        print(" DRY RUN COMPLETE. Review the logs above.")
+        print(" If everything looks correct, change DRY_RUN = False and run again.")
+    else:
+        print(" BIDIRECTIONAL MERGE COMPLETE! Both drives are now identical.")
+    print("#"*50 + "\n")
 
 
 if __name__ == "__main__":
-    safe_sync_drives(SOURCE_DRIVE, TARGET_DRIVE)
+    safe_bidirectional_merge(DRIVE_A, DRIVE_B, DRY_RUN)
