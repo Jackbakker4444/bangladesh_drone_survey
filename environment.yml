@@ -1,0 +1,25 @@
+name: bangla
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  # Data structuring & I/O
+  - numpy
+  - pandas
+  - openpyxl
+  - pyyaml
+  - tqdm
+  # Geospatial & Coordinate Systems
+  - pyproj
+  - gdal
+  - rasterio
+  - geopandas
+  - scipy
+  - matplotlib
+  - pillow
+  - opencv
+  # Pip dependencies
+  - pip
+  - pip:
+    - georinex
