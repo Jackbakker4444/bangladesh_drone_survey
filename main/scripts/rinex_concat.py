@@ -30,11 +30,11 @@ def merge_rinex_files(file1_path, file2_path, output_path):
 
 if __name__ == "__main__":
     # Define your paths (Make sure to put the earlier time file as file_1)
-    base_dir = Path(r"F:\Meghna_UAV_Campaign_2026\01_Rajrajeshwar\Base_20261107")
+    base_dir = Path(r"F:\Meghna_UAV_Campaign_2026\01_Rajrajeshwar\Loc_02_20261109\02_Raw_GNSS_Survey\Base_Static")
     
-    file_1 = base_dir / "3375201311E4.26O"  # Replace with actual first file name
-    file_2 = base_dir / "3375201311G.26O"    # Replace with actual second file name
+    file_1 = base_dir / "3375201313F3.26O"  # Replace with actual first file name
+    file_2 = base_dir / "3375201313G.26O"    # Replace with actual second file name
     
-    output_combined = base_dir / "Base_20261107_Combined.26O"
+    output_combined = base_dir / "20261109_Combined.26O"
     
     merge_rinex_files(file_1, file_2, output_combined)
